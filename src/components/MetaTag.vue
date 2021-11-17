@@ -31,7 +31,6 @@ export default {
     justify-content: center;
     border: 1px solid #797979;
     border-radius: 1vw;
-    font-size: 1rem;
     padding: 0.3rem 0.5rem;
   }
   .sleep{
