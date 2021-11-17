@@ -1,59 +1,29 @@
 <template>
   <div id="app">
-    <div v-if="hasCookie" class="main-page">
-      <meta-tag></meta-tag>
-    </div>
-    <div v-else class="login">
-      <div class="user mihray" @click="selectUser(users[0])">Mihray</div>
-      <div class="user ming" @click="selectUser(users[1])">Ming</div>
-    </div>
+    <!-- 记得加这个元素，之前没写一直不跳转，我还不明白。 -->
+    <router-view />
   </div>
 </template>
 
 <script>
-import MetaTag from "@/components/MetaTag"
-import axios from "axios";
+import axios from "axios"
+import router from "@/router";
 
 export default {
-  name: 'App',
-  components: {
-    MetaTag
-  },
-  data(){
-    return{
-      eventList:[],
-      users:['mihray','ming'],
-      hasCookie:false
-    }
-  },
-  methods:{
-    selectUser(name){
-      axios.post('/api/',{
-        userName:name
-      })
-          .then((res)=>{
-            if(res.data === 'success'){
-              this.hasCookie = true
-            }
-          })
-          .catch((err)=>{
-            console.log(err)
-          })
-    }
-  },
   created() {
     axios.post('/api/',{
       req:'init'
     })
-    .then((res)=>{
-      if(res.data !== 'select-user'){
-        this.hasCookie = true
-      }
-    })
-    .catch((err)=>{
-      console.log(err)
-    })
-  }
+        .then((res)=>{
+          const nextPage = res.data === 'select-user' ? '/login' : '/home'
+          console.log('跳转到'+ nextPage)
+          router.push(nextPage)
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
+  },
+  name: 'App'
 }
 </script>
 
@@ -65,32 +35,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-.login {
-  height: 100vh;
-  background-color: #efefef;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-.user {
-  font-size: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 3rem;
-  border-radius: 0.8rem;
-  color: #ffffff;
-  width: 66vw;
-  height: 5rem;
-  cursor: pointer;
-}
-.mihray{
-  background-color: darkorange;
-}
-.ming{
-  background-color: darkmagenta;
 }
 
 </style>
