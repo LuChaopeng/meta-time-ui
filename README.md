@@ -1,4 +1,4 @@
-# learnvue3
+# meta-time-ui
 
 ## Project setup
 ```
