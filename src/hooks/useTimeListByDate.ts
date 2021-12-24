@@ -14,14 +14,13 @@ const compare = (Time1: TimeProps, Time2: TimeProps) => {
 }
 
 const useTimeListByDate = (timeList: TimeProps[]) => {
-  // 按照time的时间戳将timeList排序
-  const timeListSort: TimeProps[] = timeList.sort(compare)
+  timeList.sort(compare)
   // 最终返回的数组
   const resultTimeList: TimeProps[][] = []
   // 按照日期分组的临时group，将被push到resultTimeList里
   let tempGroupByDate: TimeProps[] = []
   let date: number|null = null
-  for (const time of timeListSort) {
+  for (const time of timeList) {
     if (date === null) {
       date = time.timestamp.getDate()
       tempGroupByDate.push(time)
@@ -34,6 +33,8 @@ const useTimeListByDate = (timeList: TimeProps[]) => {
       tempGroupByDate.push(time)
     }
   }
+  // push最后一组
+  resultTimeList.push(tempGroupByDate)
   return resultTimeList
 }
 
