@@ -25,6 +25,7 @@ const props = defineProps({
 
 <style lang="less" scoped>
 .time{
+  font-size: 14px;
   width: fit-content;
   min-width: 15vw;
   max-width: 42vw;

@@ -1,5 +1,7 @@
 <template>
-  <time-tree :time-list="timeList"></time-tree>
+  <div class="home">
+    <time-tree :time-list="timeList" class="time-tree"></time-tree>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -7,6 +9,7 @@
 import TimeTree from '@/components/TimeTree.vue'
 import type { TimeProps } from '@/components/Time.vue'
 const timeList: TimeProps[] = [
+  { activity: 'sleep', description: '要睡午觉啦', timestamp: new Date(Date.UTC(2021, 11, 24, 12, 53, 10)) },
   { activity: 'sleep', description: '我睡觉睡了好多', timestamp: new Date(Date.UTC(2021, 11, 2, 12, 53, 10)) },
   { activity: 'workout', description: '我睡觉睡了好多', timestamp: new Date(Date.UTC(2021, 11, 3, 12, 53, 10)) },
   { activity: 'note', description: '我睡觉睡了好多', timestamp: new Date(Date.UTC(2021, 11, 2, 12, 5, 10)) },
@@ -15,3 +18,13 @@ const timeList: TimeProps[] = [
   { activity: 'note', description: '我睡觉睡了好多', timestamp: new Date(Date.UTC(2021, 11, 4, 1, 5, 10)) }
 ]
 </script>
+
+<style lang="less" scoped>
+.time-tree {
+  margin-left: 20px;
+}
+.home {
+  height: 100vh;
+  background: #efefef;
+}
+</style>

@@ -9,4 +9,10 @@ import Home from '@/views/Home'
 </script>
 
 <style lang="less">
+*,::before,::after {
+  box-sizing: border-box;
+}
+body{
+  margin:0;
+}
 </style>
