@@ -11,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue'
-import type { TimeProps } from '@/components/Time.vue'
+import { PropType, ref, watch } from 'vue'
+import { TimeProps } from '@/interface'
 // 导入时"Time"无法用作组件名，奇怪
 import TimeComp from './Time.vue'
 import useTimeListByDate from '@/hooks/useTimeListByDate'
@@ -23,7 +23,15 @@ const props = defineProps({
     required: true
   }
 })
-const timeListByDate = useTimeListByDate(props.timeList)
+
+// 先总结下watch的deep，再试试曲线救国解决一下
+watch(() => props.timeList, () => {
+  console.log('改变了')
+  console.log(timeListByDate.value)
+}, { deep: true })
+// eslint-disable-next-line prefer-const
+let timeListByDate = ref(useTimeListByDate(props.timeList))
+
 // 分割线上的时间
 const splitDate = (group: TimeProps[]): string => {
   const date = group[0].timestamp.getDate()

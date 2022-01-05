@@ -2,7 +2,7 @@
 *按日期分组时间标签
 *将传入的时间标签列表按时间排序，并按照日期分组，返回分组结果
 */
-import type { TimeProps } from '@/components/Time.vue'
+import { TimeProps } from '@/interface'
 const compare = (Time1: TimeProps, Time2: TimeProps) => {
   if (Time1.timestamp > Time2.timestamp) {
     return -1

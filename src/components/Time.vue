@@ -6,16 +6,10 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, PropType } from 'vue'
+import { PropType } from 'vue'
+import { TimeProps } from '@/interface'
 
-type Activity = 'sleep' | 'workout' | 'note'
-export interface TimeProps {
-    activity: Activity,
-    description: string,
-    timestamp: Date
-}
-
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars,no-undef
 const props = defineProps({
   time: {
     type: Object as PropType<TimeProps>
