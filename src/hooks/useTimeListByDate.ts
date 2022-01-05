@@ -14,13 +14,15 @@ const compare = (Time1: TimeProps, Time2: TimeProps) => {
 }
 
 const useTimeListByDate = (timeList: TimeProps[]) => {
-  timeList.sort(compare)
+  // 减少对原数组的不必要的改动，避免重复触发watch。并且不能直接const arrA = arrB，这只是传递了引用
+  const newTimeList = timeList.slice()
+  newTimeList.sort(compare)
   // 最终返回的数组
   const resultTimeList: TimeProps[][] = []
   // 按照日期分组的临时group，将被push到resultTimeList里
   let tempGroupByDate: TimeProps[] = []
   let date: number|null = null
-  for (const time of timeList) {
+  for (const time of newTimeList) {
     if (date === null) {
       date = time.timestamp.getDate()
       tempGroupByDate.push(time)
