@@ -1,6 +1,6 @@
 <template>
-  <div class="add-time">
-    <div class="panel" v-if="showPanel">
+  <div class="add-time" >
+    <div class="panel" v-show="showPanel" ref="panelRef">
       <form method="" id="addTimeForm">
         <textarea name="addTimeForm" v-model="timeProps.description"></textarea>
         <div class="options">
@@ -17,13 +17,14 @@
         </div>
       </form>
     </div>
-    <div class="pri-btn" @click="switchPanel"><span>{{btnSymbol}}</span></div>
+    <div class="pri-btn" @click="switchPanel" ref="btnRef"><span>{{btnSymbol}}</span></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, PropType, ref } from 'vue'
+import { reactive, PropType, ref, watch } from 'vue'
 import { TimeProps } from '@/interface'
+import useClickInside from '@/hooks/useClickInside'
 
 export interface Tag {
   id: string,
@@ -39,26 +40,35 @@ const props = defineProps({
 })
 // eslint-disable-next-line no-undef,no-unused-vars
 const emit = defineEmits(['addToHome'])
-// 这里手动关闭了eslint的prefer-const检查
-// eslint-disable-next-line prefer-const
-let timeProps = reactive<TimeProps>({
+const timeProps = reactive<TimeProps>({
   activity: 'note',
   description: '',
   timestamp: new Date()
 })
-/* eslint-disable prefer-const */
-let showPanel = ref(false)
-let btnSymbol = ref('+')
+
+const showPanel = ref(false)
+const btnSymbol = ref('+')
+const panelRef = ref<HTMLElement|null>(null)
+const btnRef = ref<HTMLElement|null>(null)
+const isClickInside = useClickInside([panelRef, btnRef])
+
+watch(isClickInside, () => {
+  if (!isClickInside.value) {
+    showPanel.value = false
+    btnSymbol.value = '+'
+  }
+})
+
 const addTime = (): void => {
   timeProps.timestamp = new Date()
   emit('addToHome', timeProps)
   timeProps.description = ''
 }
 const cancel = (): void => {
-  showPanel.value = false
-  btnSymbol.value = '+'
+  // 效果等同于点击元素外
+  isClickInside.value = false
 }
-const switchPanel = (): void => {
+const switchPanel = () => {
   showPanel.value = !showPanel.value
   btnSymbol.value = showPanel.value ? '-' : '+'
 }

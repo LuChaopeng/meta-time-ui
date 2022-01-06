@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, shallowRef, watch, onMounted, onUpdated, onUnmounted } from 'vue'
+import { PropType, shallowRef, watch } from 'vue'
 import { TimeProps } from '@/interface'
 // 导入时"Time"无法用作组件名，奇怪
 import TimeComp from './Time.vue'
@@ -26,12 +26,9 @@ const props = defineProps({
 
 // eslint-disable-next-line prefer-const
 let timeListByDate = shallowRef(useTimeListByDate(props.timeList))
-console.log(timeListByDate)
-console.log(timeListByDate.value)
 
 watch(() => props.timeList, () => {
   timeListByDate.value = useTimeListByDate(props.timeList)
-  console.log('改变了')
 }, { deep: true })
 // 分割线上的时间
 const splitDate = (group: TimeProps[]): string => {
@@ -48,16 +45,7 @@ const splitDate = (group: TimeProps[]): string => {
   }
   return dateStr
 }
-console.log('created')
-onMounted(() => {
-  console.log('mounted!')
-})
-onUpdated(() => {
-  console.log('updated!')
-})
-onUnmounted(() => {
-  console.log('unmounted!')
-})
+
 </script>
 
 <style lang="less" scoped>

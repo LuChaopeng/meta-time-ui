@@ -46,12 +46,12 @@ function onAddToHome (e: TimeProps) {
   margin-left: 20px;
 }
 .add-time{
-  position: absolute;
+  position: fixed;
   bottom: 30px;
   right: 40px;
 }
 .home {
-  height: 100vh;
+  min-height: 100vh;
   background: #efefef;
 }
 </style>
