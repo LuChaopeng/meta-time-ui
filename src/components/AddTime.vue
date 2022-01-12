@@ -22,9 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, PropType, ref, watch } from 'vue'
+import { reactive, PropType, ref, watch, toRaw } from 'vue'
 import { TimeProps } from '@/interface'
 import useClickInside from '@/hooks/useClickInside'
+import service from '@/utils/request.ts'
 
 export interface Tag {
   id: string,
@@ -62,6 +63,14 @@ watch(isClickInside, () => {
 const addTime = (): void => {
   timeProps.timestamp = new Date()
   emit('addToHome', timeProps)
+  const rawTag = toRaw(timeProps)
+  service.post('/mtapi/submit-tag', rawTag)
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
   timeProps.description = ''
 }
 const cancel = (): void => {

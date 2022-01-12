@@ -6,22 +6,17 @@
 </template>
 
 <script lang="ts" setup>
-import { shallowReactive } from 'vue'
+import { shallowReactive, onMounted } from 'vue'
 import TimeTree from '@/components/TimeTree.vue'
 import type { TimeProps } from '@/interface'
 import AddTime from '@/components/AddTime.vue'
 import type { Tag } from '@/components/AddTime.vue'
+import service from '@/utils/request.ts'
 
 // Tip：这里确实没有代理深层，若这里使用reactive代理深层，由于Date的原因，需要在reactive后面加泛型，如 const timeList = reactive<TimeProps[]>([])
 const timeList: TimeProps[] = shallowReactive([
-  { activity: 'sleep', description: '要睡午觉啦', timestamp: new Date(Date.UTC(2021, 11, 24, 12, 53, 10)) },
-  { activity: 'sleep', description: '我睡觉睡了好多', timestamp: new Date(Date.UTC(2021, 11, 2, 12, 53, 10)) },
-  { activity: 'workout', description: '跑路700km', timestamp: new Date(Date.UTC(2021, 11, 3, 12, 53, 10)) },
-  { activity: 'note', description: '笑死，这个人又吃多了', timestamp: new Date(Date.UTC(2021, 11, 2, 12, 5, 10)) },
-  { activity: 'sleep', description: '今日份早睡', timestamp: new Date(Date.UTC(2021, 11, 4, 12, 53, 10)) },
-  { activity: 'workout', description: '骑行300米', timestamp: new Date(Date.UTC(2021, 11, 5, 12, 53, 10)) },
-  { activity: 'note', description: '？？好奇怪', timestamp: new Date(Date.UTC(2021, 11, 4, 1, 5, 10)) }
-])
+  { activity: 'note', description: '开始记录吧！', timestamp: new Date(Date.UTC(2021, 0, 1, 0, 1, 0)) }])
+
 // 添加time时表单内的标签列表
 const tagList: Tag[] = [
   { id: 'sleep', value: 'sleep', content: '睡眠打卡' },
@@ -38,6 +33,28 @@ function onAddToHome (e: TimeProps) {
   timeList.push(temTime)
 }
 
+onMounted(() => {
+  service.get('/mtapi/init')
+    .then((res) => {
+      console.log(JSON.stringify(res.data))
+      for (const timeProps of res.data as TimeProps[]) {
+        const date: string = timeProps.timestamp.toString()
+        timeProps.timestamp = new Date(Date.UTC(
+          Number(date.slice(0, 4)),
+          Number(date.slice(5, 7)) - 1,
+          Number(date.slice(8, 10)),
+          Number(date.slice(11, 13)),
+          Number(date.slice(14, 16)),
+          Number(date.slice(17, 19)),
+          Number(date.slice(20, 23))
+        ))
+        timeList.push(timeProps)
+      }
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+})
 </script>
 
 <style lang="less" scoped>
