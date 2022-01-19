@@ -37,7 +37,7 @@ const login = () => {
   align-items: center;
   height: 100vh;
   background: #efefef;
-  head{
+  header{
     display: flex;
     margin-top: 17vh;
     margin-bottom: 8vh;
