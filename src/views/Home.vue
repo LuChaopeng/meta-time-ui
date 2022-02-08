@@ -15,7 +15,7 @@ import service from '@/utils/request.ts'
 
 // Tip：这里确实没有代理深层，若这里使用reactive代理深层，由于Date的原因，需要在reactive后面加泛型，如 const timeList = reactive<TimeProps[]>([])
 const timeList: TimeProps[] = shallowReactive([
-  { activity: 'note', description: '开始记录吧！', timestamp: new Date(Date.UTC(2021, 0, 1, 0, 1, 0)) }])
+  { activity: 'note', description: '开始记录吧！', timestamp: new Date(Date.UTC(2021, 0, 1, 0, 1, 0)), _id: 'demoID' }])
 
 // 添加time时表单内的标签列表
 const tagList: Tag[] = [
@@ -28,7 +28,8 @@ function onAddToHome (e: TimeProps) {
   const temTime: TimeProps = {
     activity: e.activity,
     description: e.description,
-    timestamp: e.timestamp
+    timestamp: e.timestamp,
+    _id: e._id
   }
   timeList.push(temTime)
 }

@@ -44,7 +44,8 @@ const emit = defineEmits(['addToHome'])
 const timeProps = reactive<TimeProps>({
   activity: 'note',
   description: '',
-  timestamp: new Date()
+  timestamp: new Date(),
+  _id: 'null'
 })
 
 const showPanel = ref(false)
@@ -62,16 +63,17 @@ watch(isClickInside, () => {
 
 const addTime = (): void => {
   timeProps.timestamp = new Date()
-  emit('addToHome', timeProps)
   const rawTag = toRaw(timeProps)
   service.post('/mtapi/submit-tag', rawTag)
     .then((res) => {
       console.log(res)
+      timeProps._id = res.data._id
+      emit('addToHome', timeProps)
+      timeProps.description = ''
     })
     .catch((err) => {
       console.log(err)
     })
-  timeProps.description = ''
 }
 const cancel = (): void => {
   // 效果等同于点击元素外
