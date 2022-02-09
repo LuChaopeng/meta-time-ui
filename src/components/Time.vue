@@ -1,15 +1,22 @@
 <template>
-  <div v-if="!showOperation"
-       class="time"
-       :class="time.activity"
-       v-longtap="switchOperate"
-  >{{time.description}}</div>
-  <div v-else
-       class="time operation"
-  >
+  <div v-if="showOperation" class="time operation">
     <div class="delete" @touchend="deleteTime">删除</div>
     <div class="cancel" @touchend="switchOperate">取消</div>
   </div>
+  <div v-else-if="showDetail"
+       @click="switchDetail"
+       class="time time-col"
+       :class="time.activity" >
+    <div>{{time.description}}</div>
+    <div class="activity">{{activity}}</div>
+    <div class="time-stamp">{{timeStamp}}</div>
+  </div>
+  <div v-else
+       class="time"
+       :class="time.activity"
+       v-longtap="switchOperate"
+       @click="switchDetail"
+  >{{time.description}}</div>
 </template>
 
 <script setup lang="ts">
@@ -27,11 +34,17 @@ const props = defineProps({
 // time可能是undefined
 const timeDefined = props.time as TimeProps
 const showOperation = ref(false)
+const showDetail = ref(false)
+const activity = timeDefined.activity === 'sleep' ? '睡眠打卡' : (timeDefined.activity === 'note' ? '小日记' : '运动打卡')
+const timeStamp = `${timeDefined.timestamp.getFullYear() % 100}-${timeDefined.timestamp.getMonth() + 1}-${timeDefined.timestamp.getDate()}  ${timeDefined.timestamp.getHours()}:${timeDefined.timestamp.getMinutes()}`
 const switchOperate = () => {
   // 不可对初始的示例行进行操作
   if (timeDefined._id !== 'demoID') {
     showOperation.value = !showOperation.value
   }
+}
+const switchDetail = () => {
+  showDetail.value = !showDetail.value
 }
 const deleteTime = () => {
   service.post('/mtapi/delete-tag', { id: timeDefined._id })
@@ -52,6 +65,20 @@ const deleteTime = () => {
   border: 1px solid #797979;
   border-radius: 1vw;
   padding: 0.3rem 0.5rem;
+}
+.time-col{
+  flex-direction: column;
+  .activity{
+    color: #eeeeee;
+    align-self: flex-end;
+    margin-top: 10px;
+  }
+  .time-stamp{
+    align-self: flex-end;
+    color: #e5e5e5;
+    padding-bottom: 2px;
+    border-bottom: solid 1px #dddddd;
+  }
 }
 .sleep{
   background-color: #F7B836;
