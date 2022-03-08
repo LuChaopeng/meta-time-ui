@@ -1,8 +1,20 @@
 <template>
   <div class="add-time" >
     <div class="panel" v-show="showPanel" ref="panelRef">
-      <form method="" id="addTimeForm">
+      <form id="addTimeForm">
         <textarea name="addTimeForm" v-model="timeProps.description"></textarea>
+        <div class="picture">
+          <div class="choose-button" @click="uploadPicture">
+            <span>选择一张&nbsp;</span>
+            <img src="../../public/pic.png" alt="上传图片" class="upload-picture">
+          </div>
+          <div v-show="hasPic" class="preview-picture">
+            <div class="delete-picture" @click="deletePicture">x</div>
+            <img ref=picPreview alt="图片预览" >
+          </div>
+          <hr class="hr" />
+        </div>
+        <input type="file" accept="image/*" ref="inputRef" @change="choosePicture" style="display: none">
         <div class="options">
           <label :for="tag.id" class="tag" :class="tag.value" v-for="tag in tags" :key="tag">
             <div class="content">{{tag.content}}</div>
@@ -25,6 +37,7 @@
 import { reactive, PropType, ref, watch, toRaw } from 'vue'
 import { TimeProps } from '@/interface'
 import useClickInside from '@/hooks/useClickInside'
+import usePictureCompressor from '@/hooks/usePictureCompressor'
 import service from '@/utils/request.ts'
 
 export interface Tag {
@@ -52,7 +65,13 @@ const showPanel = ref(false)
 const btnSymbol = ref('+')
 const panelRef = ref<HTMLElement|null>(null)
 const btnRef = ref<HTMLElement|null>(null)
+const picPreview = ref<HTMLImageElement | null>(null)
 const isClickInside = useClickInside([panelRef, btnRef])
+const hasPic = ref(false)
+// eslint-disable-next-line no-unused-vars
+let picCompressed: string = ''
+// 用于选择图片的<input>元素的引用
+const inputRef = ref<HTMLInputElement | null>(null)
 
 watch(isClickInside, () => {
   if (!isClickInside.value) {
@@ -64,12 +83,14 @@ watch(isClickInside, () => {
 const addTime = (): void => {
   timeProps.timestamp = new Date()
   const rawTag = toRaw(timeProps)
-  service.post('/mtapi/submit-tag', rawTag)
+  service.post('/mtapi/submit-tag', { ...rawTag, picture: picCompressed })
     .then((res) => {
       console.log(res)
       timeProps._id = res.data._id
       emit('addToHome', timeProps)
       timeProps.description = ''
+      picCompressed = ''
+      hasPic.value = false
     })
     .catch((err) => {
       console.log(err)
@@ -83,6 +104,30 @@ const switchPanel = () => {
   showPanel.value = !showPanel.value
   btnSymbol.value = showPanel.value ? '-' : '+'
 }
+
+// 上传图片事件处理函数
+const uploadPicture = () => {
+  (inputRef.value as HTMLInputElement).click()
+}
+// <input>选中图片，触发@change事件时的处理函数
+const choosePicture = async (e: InputEvent) => {
+  // 找不到类似InputChangeEvent的TS类型，所以多用了些断言
+  // 从e中获取input的file: File文件
+  const picFile: File = ((e.target as HTMLInputElement).files as FileList)[0]
+  // 使用URL.createObjectURL为File对象创建一个对象URL
+  const picURL = URL.createObjectURL(picFile)
+  let width:number, height:number;
+  // 已声明的变量解构赋值，加括号
+  ({ compressedPicture: picCompressed, width, height } = await usePictureCompressor(picURL))
+  hasPic.value = true;
+  (picPreview.value as HTMLImageElement).src = picCompressed;
+  (picPreview.value as HTMLImageElement).width = (width > height) ? 150 : 100
+}
+const deletePicture = () => {
+  picCompressed = ''
+  hasPic.value = false
+}
+
 </script>
 
 <style lang="less" scoped>
@@ -113,18 +158,56 @@ const switchPanel = () => {
   align-items: center;
   background: #d7d6ed;
   form{
+    @form-width: 100%;
+    @form-border: 2px solid #797979;
+    @form-border-radius: 8px;
     width: 100%;
     textarea{
+      position: relative;
       color: #333333;
       background: #ffffff;
-      margin-bottom: 5px;
       padding:10px;
-      width: 100%;
+      width: @form-width;
       height: 100px;
-      border: 2px solid #797979;
-      border-radius: 8px;
+      border: @form-border;
+      border-radius: @form-border-radius;
       font-size: inherit;
       opacity: 0.7;
+    }
+    .picture{
+      .choose-button{
+        @height: 30px;
+        width: @form-width;
+        border: @form-border;
+        border-radius: @form-border-radius;
+        height: @height;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .upload-picture{
+        width: 28px;
+        height: 21px;
+      }
+      .preview-picture{
+        margin-top: 5px;
+        display: flex;
+        justify-content: center;
+        .delete-picture{
+          position: relative;
+          color: #ffffff;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 20px;
+          height: 20px;
+          background: rgba(100,100,100,0.7);
+          margin-right: -20px;
+        }
+      }
+      .hr{
+        margin: 5px;
+      }
     }
     .options{
       display: flex;

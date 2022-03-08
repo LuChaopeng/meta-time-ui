@@ -37,7 +37,6 @@ function onAddToHome (e: TimeProps) {
 onMounted(() => {
   service.get('/mtapi/init')
     .then((res) => {
-      console.log(JSON.stringify(res.data))
       for (const timeProps of res.data as TimeProps[]) {
         const date: string = timeProps.timestamp.toString()
         timeProps.timestamp = new Date(Date.UTC(

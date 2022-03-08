@@ -7,7 +7,8 @@
        @click="switchDetail"
        class="time time-col"
        :class="time.activity" >
-    <div>{{time.description}}</div>
+    <div class="description">{{time.description}}</div>
+    <div v-show="pictureLoaded"><img class="picture" :src="picture" alt="图片预览"></div>
     <div class="activity">{{activity}}</div>
     <div class="time-stamp">{{timeStamp}}</div>
   </div>
@@ -37,6 +38,8 @@ const showOperation = ref(false)
 const showDetail = ref(false)
 const activity = timeDefined.activity === 'sleep' ? '睡眠打卡' : (timeDefined.activity === 'note' ? '小日记' : '运动打卡')
 const timeStamp = `${timeDefined.timestamp.getFullYear() % 100}-${timeDefined.timestamp.getMonth() + 1}-${timeDefined.timestamp.getDate()}  ${timeDefined.timestamp.getHours()}:${timeDefined.timestamp.getMinutes()}`
+const pictureLoaded = ref(false)
+const picture = ref<String|null>(null)
 const switchOperate = () => {
   // 不可对初始的示例行进行操作
   if (timeDefined._id !== 'demoID') {
@@ -45,6 +48,15 @@ const switchOperate = () => {
 }
 const switchDetail = () => {
   showDetail.value = !showDetail.value
+  if (showDetail.value && picture.value === null) {
+    service.post('/mtapi/get-picture', { id: timeDefined._id })
+      .then((res) => {
+        picture.value = 'data:image/jpeg;base64,' + res.data
+        if (res.data !== '') {
+          pictureLoaded.value = true
+        }
+      })
+  }
 }
 const deleteTime = () => {
   service.post('/mtapi/delete-tag', { id: timeDefined._id })
@@ -60,6 +72,7 @@ const deleteTime = () => {
   width: fit-content;
   min-width: 15vw;
   max-width: 42vw;
+  min-height: 32px;
   display: flex;
   justify-content: center;
   border: 1px solid #797979;
@@ -68,10 +81,17 @@ const deleteTime = () => {
 }
 .time-col{
   flex-direction: column;
+  .description{
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  .picture{
+    width: 100%;
+    border-radius: 5%;
+  }
   .activity{
     color: #eeeeee;
     align-self: flex-end;
-    margin-top: 10px;
   }
   .time-stamp{
     align-self: flex-end;
